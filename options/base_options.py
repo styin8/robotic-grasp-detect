@@ -8,11 +8,20 @@ class BaseOptions():
 
     def initialize(self, parser):
         parser.add_argument("--dataroot", required=False, help="path to data")
+        parser.add_argument("--dataset_name", type=str,
+                            default="cornell", help="name of dataset")
+        parser.add_argument("--shuffle", type=bool,
+                            default=True, help="shuffle dataset")
+        parser.add_argument("--num_threads", type=int, default=4,
+                            help="number of threads for data loader")
         parser.add_argument("--checkpoints_dir", type=str,
                             default="./checkpoints", help="models are saved here")
         parser.add_argument(
             "--name", type=str, default="copyright@1st.", help="the name of experience")
-
+        parser.add_argument("--enable_depth", type=bool,
+                            default=1, help="weather enable depth image")
+        parser.add_argument("--enable_rgb", type=bool,
+                            default=0, help="weather enable rgb image")
         parser.add_argument("--gpu_ids", default="-1", help="use -1 for cpu")
         parser.add_argument("--model", type=str,
                             default="ggcnn", help="the name of model")
