@@ -7,14 +7,14 @@ def find_dataset_using_name(dataset_name):
 
     dataset = None
     target_dataset_name = dataset_name.replace('_', '') + 'dataset'
-    if name, cls in datasetlib.__dict__.items():
+    for name, cls in datasetlib.__dict__.items():
         if name.lower() == target_dataset_name.lower() and issubclass(cls, BaseDataset):
             dataset = cls
 
     if dataset is None:
         raise NotImplementedError(
             f"In {dataset_filename}.py, there should be a subclass of BaseDataset with class name that matches {target_dataset_name} in lowercase.")
-    retrun dataset
+    return dataset
 
 def create_dataset(opt):
     data_loader = CustomDatasetDataLoader(opt)
