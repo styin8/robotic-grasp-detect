@@ -16,6 +16,6 @@ class TrainOptions(BaseOptions):
                             default=8, help="input batch size")
         parser.add_argument("--init_weight", type=bool,
                             default=True, help="initial weight")
-
+        parser.add_argument("--save_epoch_freq", type=int,default=50,help="frequency of saving checkpoints at the end of epochs")
         self.isTrain = True
         return parser

@@ -12,6 +12,16 @@ class BaseOptions():
                             default="cornell", help="name of dataset")
         parser.add_argument("--shuffle", type=bool,
                             default=True, help="shuffle dataset")
+        parser.add_argument("--start", type=float,
+                            default=0.0, help="start of dataset")
+        parser.add_argument("--end", type=float, default=1,
+                            help="end of dataset")
+        parser.add_argument("--ds_rotate", type=float,
+                            default=0.0, help="weather dataset rotation")
+        parser.add_argument("--random_rotate", type=bool, default=True,help="weather random rotate")
+        parser.add_argument("--random_zoom", type=bool, default=True,help="weather random zoom")
+        parser.add_argument("--output_size", type=int, default=300,help="output size")
+
         parser.add_argument("--num_threads", type=int, default=4,
                             help="number of threads for data loader")
         parser.add_argument("--checkpoints_dir", type=str,

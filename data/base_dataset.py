@@ -1,37 +1,41 @@
 from abc import ABC, abstractmethod
 from torch.utils.data import Dataset
 import torch
+import numpy as np
+import random
 
 
 class BaseDataset(Dataset, ABC):
     def __init__(self, opt):
         self.opt = opt
         self.root = opt.dataroot
+        self.random_rotate = opt.random_rotate
+        self.random_zoom = opt.random_zoom
+        self.output_size = opt.output_size
 
     @abstractmethod
     def __len__(self):
         pass
 
+
     @abstractmethod
-    def __getitem__(self, index):
+    def get_gtbb(self, idx, rot=0, zoom=1.0):
         pass
 
-    
+    @abstractmethod
+    def get_depth(self, idx, rot=0, zoom=1.0):
+        pass
+
+    @abstractmethod
+    def get_rgb(self, idx, rot=0, zoom=1.0):
+        pass
+
     @staticmethod
     def numpy_to_torch(s):
         if len(s.shape) == 2:
             return torch.from_numpy(np.expand_dims(s, 0).astype(np.float32))
         else:
             return torch.from_numpy(s.astype(np.float32))
-
-    def get_gtbb(self, idx, rot=0, zoom=1.0):
-        raise NotImplementedError()
-
-    def get_depth(self, idx, rot=0, zoom=1.0):
-        raise NotImplementedError()
-
-    def get_rgb(self, idx, rot=0, zoom=1.0):
-        raise NotImplementedError()
 
     def __getitem__(self, idx):
         if self.random_rotate:
@@ -56,7 +60,8 @@ class BaseDataset(Dataset, ABC):
         # Load the grasps
         bbs = self.get_gtbb(idx, rot, zoom_factor)
 
-        pos_img, ang_img, width_img = bbs.draw((self.output_size, self.output_size))
+        pos_img, ang_img, width_img = bbs.draw(
+            (self.output_size, self.output_size))
         width_img = np.clip(width_img, 0.0, 150.0)/150.0
 
         if self.include_depth and self.include_rgb:
@@ -78,7 +83,3 @@ class BaseDataset(Dataset, ABC):
         width = self.numpy_to_torch(width_img)
 
         return x, (pos, cos, sin, width), idx, rot, zoom_factor
-
-    def __len__(self):
-        return len(self.grasp_files)
-

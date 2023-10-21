@@ -1,4 +1,6 @@
 import importlib
+import torch
+from data.base_dataset import BaseDataset
 
 
 def find_dataset_using_name(dataset_name):
@@ -15,6 +17,7 @@ def find_dataset_using_name(dataset_name):
         raise NotImplementedError(
             f"In {dataset_filename}.py, there should be a subclass of BaseDataset with class name that matches {target_dataset_name} in lowercase.")
     return dataset
+
 
 def create_dataset(opt):
     data_loader = CustomDatasetDataLoader(opt)

@@ -21,6 +21,7 @@ class GGCNNModel(BaseModel):
 
     def forward(self):
         self.pred = self.net(self.x)
+        self.compute_loss()
 
     def compute_loss(self):
         gt_pos, gt_sin, gt_cos, gt_width = self.gt
@@ -31,21 +32,18 @@ class GGCNNModel(BaseModel):
         loss_cos = F.mse_loss(pred_cos, gt_cos)
         loss_width = F.mse_loss(pred_width, gt_width)
 
-        return {
-            'loss': loss_pos + loss_sin + loss_cos + loss_width,
-            'losses': {
-                'loss_pos': loss_pos,
-                'loss_sin': loss_sin,
-                'loss_cos': loss_cos,
-                'loss_width': loss_width
-            },
-            'pred': {
-                'pos': pred_pos,
-                'sin': pred_sin,
-                'cos': pred_cos,
-                'width': pred_width
-            }
+        self.loss = loss_pos + loss_sin + loss_cos + loss_width
+        self.loss = {
+            'loss_pos': loss_pos,
+            'loss_sin': loss_sin,
+            'loss_cos': loss_cos,
+            'loss_width': loss_width
         }
+
+        self.pred = {'pos': pred_pos,
+                     'sin': pred_sin,
+                     'cos': pred_cos,
+                     'width': pred_width}
 
     def backward(self):
         self.loss.backward()

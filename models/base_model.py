@@ -32,8 +32,10 @@ class BaseModel(ABC):
     def load_network(self):
         pass
 
-    def save_network(self, net, opt):
-        pass
+    def save_network(self, epoch):
+        save_path = os.path.join(
+            self.opt.checkpoints_dir, self.opt.name, f'{self.opt.model}_net_{epoch}.pth')
+        torch.save(self.net.state_dict(), save_path)
 
     def print_network(self):
         message = ""
