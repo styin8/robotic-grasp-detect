@@ -14,7 +14,7 @@ class BaseOptions():
                             default=True, help="shuffle dataset")
         parser.add_argument("--start", type=float,
                             default=0.0, help="start of dataset")
-        parser.add_argument("--end", type=float, default=1,
+        parser.add_argument("--end", type=float, default=0.9,
                             help="end of dataset")
         parser.add_argument("--ds_rotate", type=float,
                             default=0.0, help="weather dataset rotation")
