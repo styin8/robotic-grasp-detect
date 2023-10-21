@@ -16,11 +16,18 @@ class BaseOptions():
                             default=0.0, help="start of dataset")
         parser.add_argument("--end", type=float, default=0.9,
                             help="end of dataset")
+        parser.add_argument("--train_test_split", type=float,
+                            default=0.9, help="train test split")
+        parser.add_argument("--train_val_split", type=float,
+                            default=0.9, help="train val split")
         parser.add_argument("--ds_rotate", type=float,
                             default=0.0, help="weather dataset rotation")
-        parser.add_argument("--random_rotate", type=bool, default=True,help="weather random rotate")
-        parser.add_argument("--random_zoom", type=bool, default=True,help="weather random zoom")
-        parser.add_argument("--output_size", type=int, default=300,help="output size")
+        parser.add_argument("--random_rotate", type=bool,
+                            default=True, help="weather random rotate")
+        parser.add_argument("--random_zoom", type=bool,
+                            default=True, help="weather random zoom")
+        parser.add_argument("--output_size", type=int,
+                            default=300, help="output size")
 
         parser.add_argument("--num_threads", type=int, default=4,
                             help="number of threads for data loader")
@@ -55,7 +62,7 @@ class BaseOptions():
         save_dir = os.path.join(opt.checkpoints_dir, opt.name)
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
-        file_name = os.path.join(save_dir, f'{opt.name}opt.txt')
+        file_name = os.path.join(save_dir, f'{opt.name}_opt.txt')
         with open(file_name, 'wt') as f:
             f.write(message)
             f.write('\n')

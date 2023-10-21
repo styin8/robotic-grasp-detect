@@ -184,7 +184,7 @@ class GraspRectangles:
                a = np.concatenate((a, np.zeros((pad_to - len(self.grs), 4, 2))))
         return a.astype(np.int)
 
-    @property
+    # @property
     def center(self):
         """
         Compute mean center of all GraspRectangles

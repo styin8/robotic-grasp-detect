@@ -6,17 +6,19 @@ import random
 
 
 class BaseDataset(Dataset, ABC):
-    def __init__(self, opt):
+    def __init__(self, opt, mode):
         self.opt = opt
         self.root = opt.dataroot
         self.random_rotate = opt.random_rotate
         self.random_zoom = opt.random_zoom
         self.output_size = opt.output_size
+        self.enable_depth = opt.enable_depth
+        self.enable_rgb = opt.enable_rgb
+        self.mode = mode
 
     @abstractmethod
     def __len__(self):
         pass
-
 
     @abstractmethod
     def get_gtbb(self, idx, rot=0, zoom=1.0):
@@ -50,11 +52,11 @@ class BaseDataset(Dataset, ABC):
             zoom_factor = 1.0
 
         # Load the depth image
-        if self.include_depth:
+        if self.enable_depth:
             depth_img = self.get_depth(idx, rot, zoom_factor)
 
         # Load the RGB image
-        if self.include_rgb:
+        if self.enable_rgb:
             rgb_img = self.get_rgb(idx, rot, zoom_factor)
 
         # Load the grasps
@@ -64,7 +66,7 @@ class BaseDataset(Dataset, ABC):
             (self.output_size, self.output_size))
         width_img = np.clip(width_img, 0.0, 150.0)/150.0
 
-        if self.include_depth and self.include_rgb:
+        if self.enable_depth and self.enable_rgb:
             x = self.numpy_to_torch(
                 np.concatenate(
                     (np.expand_dims(depth_img, 0),
@@ -72,9 +74,9 @@ class BaseDataset(Dataset, ABC):
                     0
                 )
             )
-        elif self.include_depth:
+        elif self.enable_depth:
             x = self.numpy_to_torch(depth_img)
-        elif self.include_rgb:
+        elif self.enable_rgb:
             x = self.numpy_to_torch(rgb_img)
 
         pos = self.numpy_to_torch(pos_img)
@@ -82,4 +84,4 @@ class BaseDataset(Dataset, ABC):
         sin = self.numpy_to_torch(np.sin(2*ang_img))
         width = self.numpy_to_torch(width_img)
 
-        return x, (pos, cos, sin, width), idx, rot, zoom_factor
+        return x, (pos, sin, cos, width), idx, rot, zoom_factor

@@ -1,23 +1,25 @@
 from .base_model import BaseModel
 import torch
 import torch.nn.functional as F
+from utils import evaluation
 
 
 class GGCNNModel(BaseModel):
     def __init__(self, opt):
         BaseModel.__init__(self, opt)
-        if self.isTrain:
-            self.optimizer = torch.optim.Adam(
-                self.net.parameters(), lr=opt.lr)
 
     def load_network(self):
         from .networks import GGCNN
         input_channels = self.opt.enable_rgb * 3 + self.opt.enable_depth
-        return GGCNN(input_channels)
+        self.net = GGCNN(input_channels)
+        if self.isTrain:
+            self.optimizer = torch.optim.Adam(
+                self.net.parameters())
+        return self.net
 
     def set_input(self, x, gt):
         self.x = x.to(self.device)
-        self.gt = gt.to(self.device)
+        self.gt = [y.to(self.device) for y in gt]
 
     def forward(self):
         self.pred = self.net(self.x)
@@ -33,7 +35,7 @@ class GGCNNModel(BaseModel):
         loss_width = F.mse_loss(pred_width, gt_width)
 
         self.loss = loss_pos + loss_sin + loss_cos + loss_width
-        self.loss = {
+        self.losses = {
             'loss_pos': loss_pos,
             'loss_sin': loss_sin,
             'loss_cos': loss_cos,
@@ -53,3 +55,15 @@ class GGCNNModel(BaseModel):
         self.optimizer.zero_grad()
         self.backward()
         self.optimizer.step()
+
+    def test(self, val_data, didx, rot, zoom_factor):
+        self.forward()
+        q_out, ang_out, w_out = self.post_process_output(self.pred['pos'], self.pred['sin'],
+                                                         self.pred['cos'], self.pred['width'])
+        s = evaluation.calculate_iou_match(q_out, ang_out,
+                                           val_data.dataset.get_gtbb(
+                                               didx, rot, zoom_factor),
+                                           no_grasps=1,
+                                           grasp_width=w_out,
+                                           )
+        return s

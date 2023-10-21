@@ -19,27 +19,27 @@ def find_dataset_using_name(dataset_name):
     return dataset
 
 
-def create_dataset(opt):
-    data_loader = CustomDatasetDataLoader(opt)
+def create_dataset(opt, mode):
+    data_loader = CustomDatasetDataLoader(opt, mode)
     return data_loader
 
 
 class CustomDatasetDataLoader():
-    def __init__(self, opt):
+    def __init__(self, opt, mode):
         self.opt = opt
         dataset_class = find_dataset_using_name(opt.dataset_name)
-        self.dataset = dataset_class(opt)
-        print(f"dataset {type(self.dataset).__name__} was created!")
+        self.dataset = dataset_class(opt, mode)
+        print(f"dataset {type(self.dataset).__name__} {mode}was created!")
         self.dataloader = torch.utils.data.DataLoader(
             self.dataset,
-            batch_size=opt.batch_size,
+            batch_size=opt.batch_size if mode == "train" else 1,
             shuffle=opt.shuffle,
             num_workers=int(opt.num_threads)
         )
 
     def __iter__(self):
-        for i, data in enumerate(self.dataloader):
-            yield data
+        for data, label, idx, rot, zoom_factor in self.dataloader:
+            yield data, label, idx, rot, zoom_factor
 
     def __len__(self):
         return len(self.dataset)

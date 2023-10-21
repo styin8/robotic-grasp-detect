@@ -6,7 +6,7 @@ from utils import grasp, image
 
 class CornellDataset(BaseDataset):
 
-    def __init__(self, opt, mode="train"):
+    def __init__(self, opt, mode):
         """
         :param file_path: Cornell Dataset directory.
         :param start: If splitting the dataset, start at this fraction [0,1]
@@ -15,39 +15,46 @@ class CornellDataset(BaseDataset):
         :param kwargs: kwargs for GraspDatasetBase
         """
         # file_path, start=0.0, end=1.0, ds_rotate=0,
-        BaseDataset.__init__(self, opt)
-        graspf = glob.glob(os.path.join(self.opt.root, '*', 'pcd*cpos.txt'))
+        BaseDataset.__init__(self, opt, mode)
+        graspf = glob.glob(os.path.join(self.root, '*', 'pcd*cpos.txt'))
         graspf.sort()
         l = len(graspf)
         if l == 0:
             raise FileNotFoundError(
-                'No dataset files found. Check path: {}'.format(self.opt.root))
+                'No dataset files found. Check path: {}'.format(self.root))
 
         if self.opt.ds_rotate:
             graspf = graspf[int(l*self.opt.ds_rotate):] + \
                 graspf[:int(l*self.opt.ds_rotate)]
-
-        depthf = [f.replace('cpos.txt', 'd.tiff') for f in graspf]
-        rgbf = [f.replace('d.tiff', 'r.png') for f in depthf]
+        depthf = [f.replace('cpos.txt', 'd.tiff').replace(
+            "pos_label", "depth_image") for f in graspf]
+        rgbf = [f.replace('d.tiff', 'r.png').replace(
+            "depth_image", "image") for f in depthf]
 
         if mode == "train":
-            self.grasp_files = graspf[int(
-                l*self.opt.start):int(l*self.opt.end*0.8)]
-            self.depth_files = depthf[int(
-                l*self.opt.start):int(l*self.opt.end*0.8)]
-            self.rgb_files = rgbf[int(l*self.opt.start)
-                                      :int(l*self.opt.end*0.8)]
+            self.grasp_files = graspf[:int(
+                l*self.opt.train_test_split*self.opt.train_val_split)]
+            self.depth_files = depthf[:int(
+                l*self.opt.train_test_split*self.opt.train_val_split)]
+            self.rgb_files = rgbf[:int(
+                l*self.opt.train_test_split*self.opt.train_val_split)]
         elif mode == "val":
             self.grasp_files = graspf[int(
-                l*self.opt.end*0.8):int(l*self.opt.end)]
+                l*self.opt.train_test_split*self.opt.train_val_split):int(l*self.opt.train_test_split)]
             self.depth_files = depthf[int(
-                l*self.opt.end*0.8):int(l*self.opt.end)]
-            self.rgb_files = rgbf[int(l*self.opt.end*0.8):int(l*self.opt.end)]
+                l*self.opt.train_test_split*self.opt.train_val_split):int(l*self.opt.train_test_split)]
+            self.rgb_files = rgbf[int(
+                l*self.opt.train_test_split*self.opt.train_val_split):int(l*self.opt.train_test_split)]
+        elif mode == "test":
+            self.grasp_files = graspf[int(l*self.opt.train_test_split):]
+            self.depth_files = depthf[int(l*self.opt.train_test_split):]
+            self.rgb_files = rgbf[int(l*self.opt.train_test_split):]
 
     def _get_crop_attrs(self, idx):
+
         gtbbs = grasp.GraspRectangles.load_from_cornell_file(
             self.grasp_files[idx])
-        center = gtbbs.center
+        center = gtbbs.center()
         left = max(
             0, min(center[1] - self.output_size // 2, 640 - self.output_size))
         top = max(0, min(center[0] - self.output_size //

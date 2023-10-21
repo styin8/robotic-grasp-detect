@@ -1,6 +1,7 @@
 import os
 import torch
 from abc import ABC, abstractmethod
+from skimage.filters import gaussian
 
 
 class BaseModel(ABC):
@@ -25,12 +26,34 @@ class BaseModel(ABC):
         pass
 
     def setup(self):
-        self.net = self.load_network()
+        self.load_network()
         self.print_network()
 
     @abstractmethod
     def load_network(self):
         pass
+
+    @abstractmethod
+    def test(self):
+        pass
+
+    def post_process_output(self, q_img, sin_img, cos_img, width_img):
+        """
+        :param q_img: Q output of net (as torch Tensors)
+        :param cos_img: cos output of net
+        :param sin_img: sin output of net
+        :param width_img: Width output of net
+        :return: Filtered Q output, Filtered Angle output, Filtered Width output
+        """
+        q_img = q_img.cpu().detach().numpy().squeeze()
+        ang_img = (torch.atan2(sin_img, cos_img) / 2.0).cpu().detach().numpy().squeeze()
+        width_img = width_img.cpu().detach().numpy().squeeze() * 150.0
+
+        q_img = gaussian(q_img, 2.0, preserve_range=True)
+        ang_img = gaussian(ang_img, 2.0, preserve_range=True)
+        width_img = gaussian(width_img, 1.0, preserve_range=True)
+
+        return q_img, ang_img, width_img
 
     def save_network(self, epoch):
         save_path = os.path.join(
@@ -52,7 +75,7 @@ class BaseModel(ABC):
         save_dir = os.path.join(self.opt.checkpoints_dir, self.opt.name)
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
-        file_name = os.path.join(save_dir, f"{self.opt.name}net.txt")
+        file_name = os.path.join(save_dir, f"{self.opt.name}_net.txt")
         with open(file_name, "wt") as f:
             f.write(message)
             f.write("\n")
