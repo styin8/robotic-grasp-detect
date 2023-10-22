@@ -8,6 +8,6 @@ class TestOptions(BaseOptions):
 
         parser.add_argument("--results_dir", type=str,
                             default="./results/", help="path to results")
-
+        parser.add_argument("--model_path", type=str, help="path to model")
         self.isTrain = False
         return parser

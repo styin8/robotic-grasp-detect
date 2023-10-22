@@ -73,10 +73,11 @@ class BaseModel(ABC):
         print(message)
 
         # save in the disk
-        save_dir = os.path.join(self.opt.checkpoints_dir, self.opt.name)
-        if not os.path.exists(save_dir):
-            os.makedirs(save_dir)
-        file_name = os.path.join(save_dir, f"{self.opt.name}_net.txt")
-        with open(file_name, "wt") as f:
-            f.write(message)
-            f.write("\n")
+        if self.opt.isTrain:
+            save_dir = os.path.join(self.opt.checkpoints_dir, self.opt.name)
+            if not os.path.exists(save_dir):
+                os.makedirs(save_dir)
+            file_name = os.path.join(save_dir, f"{self.opt.name}_net.txt")
+            with open(file_name, "wt") as f:
+                f.write(message)
+                f.write("\n")

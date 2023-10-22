@@ -20,27 +20,6 @@ def find_model_using_name(model_name):
     return model
 
 
-def print_network(net, opt):
-    message = ""
-    message += '--------------- Networks ----------------\n'
-    for _, module in net.named_modules():
-        if module.__class__.__name__ != net.__class__.__name__:
-            message += '{:<25}: {:<30}\n'.format(str(module.__class__.__name__), str(
-                sum(p.numel() for p in module.parameters())))
-    message += '-----------------------------------------\n'
-    message += f'Total number of parameters : {sum(p.numel() for p in net.parameters())/1e6:.3f} M\n'
-    print(message)
-
-    # save in the disk
-    save_dir = os.path.join(opt.checkpoints_dir, opt.name)
-    if not os.path.exists(save_dir):
-        os.makedirs(save_dir)
-    file_name = os.path.join(save_dir, f"{opt.name}net.txt")
-    with open(file_name, "wt") as f:
-        f.write(message)
-        f.write("\n")
-
-
 def create_model(opt):
     """
     """

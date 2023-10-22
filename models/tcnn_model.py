@@ -15,6 +15,9 @@ class GGCNNModel(BaseModel):
         if self.isTrain:
             self.optimizer = torch.optim.Adam(
                 self.net.parameters())
+        else:
+            self.net.load_state_dict(torch.load(
+                self.opt.model_path, map_location=self.device))
         return self.net
 
     def set_input(self, x, gt):

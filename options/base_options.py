@@ -10,8 +10,8 @@ class BaseOptions():
         parser.add_argument("--dataroot", required=False, help="path to data")
         parser.add_argument("--dataset_name", type=str,
                             default="cornell", help="name of dataset")
-        parser.add_argument("--shuffle", type=bool,
-                            default=True, help="shuffle dataset")
+        parser.add_argument("--shuffle", type=int,
+                            default=1, help="shuffle dataset")
         parser.add_argument("--start", type=float,
                             default=0.0, help="start of dataset")
         parser.add_argument("--end", type=float, default=0.9,
@@ -22,10 +22,10 @@ class BaseOptions():
                             default=0.9, help="train val split")
         parser.add_argument("--ds_rotate", type=float,
                             default=0.0, help="weather dataset rotation")
-        parser.add_argument("--random_rotate", type=bool,
-                            default=True, help="weather random rotate")
-        parser.add_argument("--random_zoom", type=bool,
-                            default=True, help="weather random zoom")
+        parser.add_argument("--random_rotate", type=int,
+                            default=1, help="weather random rotate")
+        parser.add_argument("--random_zoom", type=int,
+                            default=1, help="weather random zoom")
         parser.add_argument("--output_size", type=int,
                             default=300, help="output size")
 
@@ -59,13 +59,14 @@ class BaseOptions():
         print(message)
 
         # save to the disk
-        save_dir = os.path.join(opt.checkpoints_dir, opt.name)
-        if not os.path.exists(save_dir):
-            os.makedirs(save_dir)
-        file_name = os.path.join(save_dir, f'{opt.name}_opt.txt')
-        with open(file_name, 'wt') as f:
-            f.write(message)
-            f.write('\n')
+        if opt.isTrain:
+            save_dir = os.path.join(opt.checkpoints_dir, opt.name)
+            if not os.path.exists(save_dir):
+                os.makedirs(save_dir)
+            file_name = os.path.join(save_dir, f'{opt.name}_opt.txt')
+            with open(file_name, 'wt') as f:
+                f.write(message)
+                f.write('\n')
 
     def parse(self):
         if not self.initialized:
