@@ -4,14 +4,14 @@ import torch.nn.functional as F
 from utils import evaluation
 
 
-class GGCNN2Model(BaseModel):
+class GRCNNModel(BaseModel):
     def __init__(self, opt):
         BaseModel.__init__(self, opt)
 
     def load_network(self):
-        from .networks import GGCNN2
+        from .networks import GenerativeResnet3
         input_channels = self.opt.enable_rgb * 3 + self.opt.enable_depth
-        self.net = GGCNN2(input_channels).to(self.device)
+        self.net = GenerativeResnet3(input_channels).to(self.device)
         if self.isTrain:
             self.optimizer = torch.optim.Adam(
                 self.net.parameters())
@@ -29,10 +29,10 @@ class GGCNN2Model(BaseModel):
         gt_pos, gt_sin, gt_cos, gt_width = self.gt
         pred_pos, pred_sin, pred_cos, pred_width = self.pred
 
-        loss_pos = F.mse_loss(pred_pos, gt_pos)
-        loss_sin = F.mse_loss(pred_sin, gt_sin)
-        loss_cos = F.mse_loss(pred_cos, gt_cos)
-        loss_width = F.mse_loss(pred_width, gt_width)
+        loss_pos = F.smooth_l1_loss(pred_pos, gt_pos)
+        loss_sin = F.smooth_l1_loss(pred_sin, gt_sin)
+        loss_cos = F.smooth_l1_loss(pred_cos, gt_cos)
+        loss_width = F.smooth_l1_loss(pred_width, gt_width)
 
         self.loss = loss_pos + loss_sin + loss_cos + loss_width
         self.losses = {
