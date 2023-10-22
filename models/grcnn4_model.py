@@ -4,7 +4,7 @@ import torch.nn.functional as F
 from utils import evaluation
 
 
-class GRCNNModel(BaseModel):
+class GRCNN4Model(BaseModel):
     def __init__(self, opt):
         BaseModel.__init__(self, opt)
 

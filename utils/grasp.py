@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 
 from skimage.draw import polygon
 from skimage.feature import peak_local_max
+import warnings
+warnings.filterwarnings("ignore")
 
 
 def _gr_text_to_no(l, offset=(0, 0)):

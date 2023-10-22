@@ -572,7 +572,7 @@ class TCNN(nn.Module):
 
         # Output layers
         self.out_layers = nn.Sequential(
-            nn.Conv2d(32, filter_sizes[2], 3, padding=1),
+            nn.Conv2d(64, filter_sizes[2], 3, padding=1),
             nn.ReLU(inplace=True),
             nn.UpsamplingBilinear2d(scale_factor=2),
             nn.Conv2d(filter_sizes[2], filter_sizes[3], 3, padding=1),

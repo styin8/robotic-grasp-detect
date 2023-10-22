@@ -27,9 +27,9 @@ if __name__ == "__main__":
         model.net.train()
         epoch_start_time = time.time()
         i = 0
+        total_loss = 0
         for data, label, _, _, _ in train_dataset:
             i += 1
-            total_loss = 0
             iter_start_time = time.time()
             model.set_input(data, label)
             model.optimize_parameters()

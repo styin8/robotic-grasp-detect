@@ -12,6 +12,7 @@ if __name__ == "__main__":
 
     model = create_model(opt)
     model.setup()
+    model.net.eval()
 
     correct = 0
     for data, label, idx, rot, zoom_factor in test_dataset:
