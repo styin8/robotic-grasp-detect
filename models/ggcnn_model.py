@@ -11,7 +11,7 @@ class GGCNNModel(BaseModel):
     def load_network(self):
         from .networks import GGCNN
         input_channels = self.opt.enable_rgb * 3 + self.opt.enable_depth
-        self.net = GGCNN(input_channels)
+        self.net = GGCNN(input_channels).to(self.device)
         if self.isTrain:
             self.optimizer = torch.optim.Adam(
                 self.net.parameters())

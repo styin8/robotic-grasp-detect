@@ -41,7 +41,7 @@ class BaseOptions():
                             default=0, help="weather enable rgb image")
         parser.add_argument("--gpu_ids", default="-1", help="use -1 for cpu")
         parser.add_argument("--model", type=str,
-                            default="ggcnn", help="the name of model")
+                            default="ggcnn", choices=["ggcnn", "ggcnn2"], help="the name of model")
 
         self.initialized = True
         return parser

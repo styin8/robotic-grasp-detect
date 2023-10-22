@@ -46,7 +46,8 @@ class BaseModel(ABC):
         :return: Filtered Q output, Filtered Angle output, Filtered Width output
         """
         q_img = q_img.cpu().detach().numpy().squeeze()
-        ang_img = (torch.atan2(sin_img, cos_img) / 2.0).cpu().detach().numpy().squeeze()
+        ang_img = (torch.atan2(sin_img, cos_img) /
+                   2.0).cpu().detach().numpy().squeeze()
         width_img = width_img.cpu().detach().numpy().squeeze() * 150.0
 
         q_img = gaussian(q_img, 2.0, preserve_range=True)
@@ -55,9 +56,9 @@ class BaseModel(ABC):
 
         return q_img, ang_img, width_img
 
-    def save_network(self, epoch):
+    def save_network(self, epoch, accuracy):
         save_path = os.path.join(
-            self.opt.checkpoints_dir, self.opt.name, f'{self.opt.model}_net_{epoch}.pth')
+            self.opt.checkpoints_dir, self.opt.name, f'{self.opt.model}_net_epoch_{epoch}_acc_{accuracy}.pth')
         torch.save(self.net.state_dict(), save_path)
 
     def print_network(self):
